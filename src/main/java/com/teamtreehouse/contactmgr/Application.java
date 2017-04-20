@@ -2,6 +2,7 @@ package com.teamtreehouse.contactmgr;
 
 import com.teamtreehouse.contactmgr.model.Contact;
 import com.teamtreehouse.contactmgr.model.Contact.ContactBuilder;
+import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.boot.MetadataSources;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
@@ -9,7 +10,7 @@ import org.hibernate.service.ServiceRegistry;
 
 public class Application {
 //    Hold a reusable reference to a SessionFactory (since we need only one)
-    //private static final SessionFactory sessionFactory = buildSessionFactory();
+    private static final SessionFactory sessionFactory = buildSessionFactory();
 
     private static SessionFactory buildSessionFactory() {
 
@@ -29,7 +30,21 @@ public class Application {
                 .withPhone(2125551212L)
                 .build();
 
-        System.out.println(contact);
+        // open a sesh
+        Session session = sessionFactory.openSession();
+
+        // begin transaction
+        session.beginTransaction();
+
+        // save
+        session.save(contact);
+
+        // commit
+        session.getTransaction().commit();
+
+        // close sesh
+        session.close();
+
     }
 
 
