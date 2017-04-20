@@ -2,11 +2,14 @@ package com.teamtreehouse.contactmgr;
 
 import com.teamtreehouse.contactmgr.model.Contact;
 import com.teamtreehouse.contactmgr.model.Contact.ContactBuilder;
+import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.boot.MetadataSources;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.service.ServiceRegistry;
+
+import java.util.List;
 
 public class Application {
 //    Hold a reusable reference to a SessionFactory (since we need only one)
@@ -30,7 +33,29 @@ public class Application {
                 .withPhone(2125551212L)
                 .build();
 
-        // open a sesh
+        save(contact);
+
+        fetchAllContacts().stream().forEach(System.out::println);
+
+        sessionFactory.close();
+    }
+
+    @SuppressWarnings("unchecked")
+    private static List<Contact> fetchAllContacts() {
+        Session session = sessionFactory.openSession();
+
+        // create a Hibernate criteria object
+        Criteria criteria = session.createCriteria(Contact.class);
+
+        List<Contact> contacts = criteria.list();
+
+        session.close();
+
+        return contacts;
+    }
+
+    private static void save(Contact contact) {
+        // open a session
         Session session = sessionFactory.openSession();
 
         // begin transaction
@@ -44,8 +69,5 @@ public class Application {
 
         // close sesh
         session.close();
-
     }
-
-
 }

@@ -9,7 +9,8 @@
 
         <!-- Create the database schema on startup -->
         <!-- "hbm2ddl" is Hybernate Mapping to Data Definition Library -->
-        <property name="hbm2ddl.auto">create</property>
+        <!-- "create" will wipe the db, "update" will preserve db -->
+        <property name="hbm2ddl.auto">update</property>
 
         <!-- Show queries  -->
         <property name="show_sql">true</property>
