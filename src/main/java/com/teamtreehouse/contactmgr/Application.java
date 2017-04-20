@@ -33,11 +33,61 @@ public class Application {
                 .withPhone(2125551212L)
                 .build();
 
-        save(contact);
+        int id = save(contact);
 
-        fetchAllContacts().stream().forEach(System.out::println);
+        // display all contacts before the update
+        System.out.printf("%nBefore update:%n");
+        fetchAllContacts().forEach(System.out::println);
 
+        // get persisted contact
+        Contact c = findContactById(id);
+
+        // Change something about the contact
+        c.setFirstName("Buhbye");
+
+        // Save the change back to the database
+        System.out.printf("%nUpdating%n");
+        update(c);
+        System.out.printf("%nUpdate complete%n");
+
+        // Display list after update
+        System.out.printf("%nAfter update:%n");
+        fetchAllContacts().forEach(System.out::println);
+
+        // Delete the object
+        System.out.printf("%nDeleting%n");
+        delete(c);
+        System.out.printf("%nDelete complete%n");
+
+        // Display list after delete
+        System.out.printf("%nAfter delete:%n");
+        fetchAllContacts().forEach(System.out::println);
+
+        // Close sessionFactory just before exiting the app. Optional, but keeps database tidy.
         sessionFactory.close();
+    }
+
+    private static Contact findContactById(int id) {
+        Session session = sessionFactory.openSession();
+        Contact contact = session.get(Contact.class,id);
+        session.close();
+        return contact;
+    }
+
+    private static void update(Contact contact) {
+        Session session = sessionFactory.openSession();
+        session.beginTransaction();
+        session.update(contact);
+        session.getTransaction().commit();
+        session.close();
+    }
+
+    private static void delete(Contact contact) {
+        Session session = sessionFactory.openSession();
+        session.beginTransaction();
+        session.delete(contact);
+        session.getTransaction().commit();
+        session.close();
     }
 
     @SuppressWarnings("unchecked")
@@ -54,7 +104,7 @@ public class Application {
         return contacts;
     }
 
-    private static void save(Contact contact) {
+    private static int save(Contact contact) {
         // open a session
         Session session = sessionFactory.openSession();
 
@@ -62,12 +112,14 @@ public class Application {
         session.beginTransaction();
 
         // save
-        session.save(contact);
+        int id = (int)session.save(contact);
 
         // commit
         session.getTransaction().commit();
 
         // close sesh
         session.close();
+
+        return id;
     }
 }
